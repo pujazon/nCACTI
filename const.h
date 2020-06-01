@@ -258,6 +258,12 @@ enum ram_cell_tech_type_num
   comm_dram = 4
 };
 
+enum ram_cell_ntrans_type
+{
+  noSramCell   = 0,
+  cell6t   = 1,
+  cell8t = 2
+};
 
 
 #endif

@@ -224,6 +224,29 @@ InputParameter::parse_cfg(const string & in_file)
       continue;
     }
 
+    //TODO: by the moment only num transtors cell variable applies on data cells. Should be also added
+    //      on tag cells...
+    if (!strncmp("-Data array num transistors cell", line, strlen("-Data array num transistors cell"))) {
+      sscanf(line, "-Data array num transistors cell %[^\"]\"%[^\"]\"", jk, temp_var);
+
+      if(data_arr_ram_cell_tech_type > 2) {
+        ram_cell_ntrans_type = noSramCell;
+      }
+      else {
+        if(!strncmp("6T", temp_var, strlen("6T"))) {
+          ram_cell_ntrans_type = cell6t;
+        }
+        else if(!strncmp("8T", temp_var, strlen("8T"))) {
+          ram_cell_ntrans_type = cell8t;
+        }
+        else {
+          cout << "SRAM ntransistors ERROR: Invalid type!\n";
+          exit(0);
+        }
+      }
+      continue;
+    }
+
     if (!strncmp("-Data array peripheral type", line, strlen("-Data array peripheral type"))) {
       sscanf(line, "-Data array peripheral type %[^\"]\"%[^\"]\"", jk, temp_var);
 
@@ -540,7 +563,8 @@ InputParameter::display_ip()
   }
   cout << "Model as memory               : " << is_main_mem << endl;
   cout << "Access mode                   : " << access_mode << endl;
-  cout << "Data array cell type          : " << data_arr_ram_cell_tech_type << endl;
+  cout << "Data array cell type          : " << dataCellTypeStr() << endl;
+  cout << "SRAM transistors number       : " << ntransSramStr() << endl;
   cout << "Data array peripheral type    : " << data_arr_peri_global_tech_type << endl;
   cout << "Tag array cell type           : " << tag_arr_ram_cell_tech_type << endl;
   cout << "Tag array peripheral type     : " << tag_arr_peri_global_tech_type << endl;
@@ -1469,4 +1493,46 @@ void output_UCA(uca_org_t *fr)
 
     //cout << "FO4 = " << g_tp.FO4 << endl;
   }
+}
+
+string InputParameter::ntransSramStr()
+{
+  string res;
+
+  switch(ram_cell_ntrans_type){
+    case noSramCell:
+      res = "This field only applies on SRAM cells, so it won't be taken into account.";
+      break;
+    case cell6t:
+      res = "SRAM 6T cell";
+      break;
+    case cell8t:
+      res = "SRAM 8T cell";
+      break;
+  }
+  return res;
+}
+
+string InputParameter::dataCellTypeStr()
+{
+  string res;
+
+  switch(data_arr_ram_cell_tech_type){
+    case itrs_hp:
+      res = "SRAM HighPerformance cell";
+      break;
+    case itrs_lstp:
+      res = "SRAM Low standby (leakage) power cell";
+      break;
+    case itrs_lop:
+      res = "SRAM Low operating (dynamic) power cell";
+      break;
+    case lp_dram:
+      res = "Embedded DRAM cell";
+      break;
+    case comm_dram:
+      res = "Commodity DRAM cell";
+      break;
+  }
+  return res;
 }

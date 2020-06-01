@@ -105,8 +105,6 @@ enum Wire_type
     Invalid_wtype
 };
 
-
-
 class InputParameter
 {
   public:
@@ -114,6 +112,8 @@ class InputParameter
 
     bool error_checking();  // return false if the input parameters are problematic
     void display_ip();
+    string ntransSramStr(); //TODO: Should be private
+    string dataCellTypeStr();
 
     unsigned int cache_sz;  // in bytes
     unsigned int line_sz;
@@ -142,6 +142,7 @@ class InputParameter
     unsigned int temp;
     
     unsigned int ram_cell_tech_type;
+    unsigned int ram_cell_ntrans_type;
     unsigned int peri_global_tech_type;
     unsigned int data_arr_ram_cell_tech_type;
     unsigned int data_arr_peri_global_tech_type;
