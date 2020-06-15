@@ -47,23 +47,23 @@
 
 struct Transistor
 {
-  	double width;
-  	double length;
+  	unsigned int width;
+  	unsigned int length;
 };
 
 class characterizer8t
 {
   public:
-    characterizer8t(double technology);
-    double get_technology();
-    double get_delay();
+    characterizer8t(unsigned int technology);
+    unsigned int get_technology();
+    unsigned int get_delay();
 
-    bool set_technology(double input);
+    bool set_technology(unsigned int input);
     bool characterize();
 
   private:
-    double technology;
-    double delay;
+    unsigned int technology;
+    unsigned int delay;
 
     bool characterize6t(Transistor* M1,Transistor* M2,Transistor* M3,Transistor* M4,Transistor* M5,Transistor* M6);
     bool characterizeReadTransistors(Transistor* M1,Transistor* M2,Transistor* M3,Transistor* M4,

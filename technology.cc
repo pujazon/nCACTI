@@ -988,7 +988,7 @@ void init_tech_params(double technology, bool is_tag)
 
     //PUJA
     if(g_ip->ram_cell_ntrans_type == cell8t) {
-      //printf("Characterize 8T cell with %s technology\n", g_ip->ram_cell_ntrans_type);
+      printf("Characterize 8T cell \n");
       eightCell.set_technology(tech);
       curr_area_cell_sram = eightCell.characterize();
     }
