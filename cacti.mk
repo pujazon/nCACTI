@@ -24,9 +24,9 @@ CXXFLAGS = -Wno-unknown-pragmas $(DBG) $(OPT)
 CXX = g++ -m32
 CC  = gcc -m32
 
-SRCS  = area.cc bank.cc mat.cc main.cc Ucache.cc io.cc technology.cc basic_circuit.cc parameter.cc \
+SRCS  = area.cc bank.cc mat.cc characterizer8t.cc main.cc Ucache.cc io.cc technology.cc basic_circuit.cc parameter.cc \
 		decoder.cc component.cc uca.cc subarray.cc wire.cc htree2.cc \
-		cacti_interface.cc router.cc nuca.cc crossbar.cc arbiter.cc 
+		cacti_interface.cc router.cc nuca.cc crossbar.cc arbiter.cc
 
 OBJS = $(patsubst %.cc,obj_$(TAG)/%.o,$(SRCS))
 PYTHONLIB_SRCS = $(patsubst main.cc, ,$(SRCS)) obj_$(TAG)/cacti_wrap.cc

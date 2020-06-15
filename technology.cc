@@ -42,6 +42,8 @@
 #include "basic_circuit.h"
 
 #include "parameter.h"
+#include "const.h"
+#include "characterizer8t.h"
 
 double wire_resistance(double resistivity, double wire_width, double wire_thickness,
     double barrier_thickness, double dishing_thickness, double alpha_scatter)
@@ -377,6 +379,10 @@ void init_tech_params(double technology, bool is_tag)
       curr_Wmemcella_sram = 1.31 * g_ip->F_sz_um;
       curr_Wmemcellpmos_sram = 1.23 * g_ip->F_sz_um;
       curr_Wmemcellnmos_sram = 2.08 * g_ip->F_sz_um;
+      
+      curr_area_cell_sram = 146 * g_ip->F_sz_um * g_ip->F_sz_um;
+      curr_asp_ratio_cell_sram = 1.46;
+
       curr_area_cell_sram = 146 * g_ip->F_sz_um * g_ip->F_sz_um;
       curr_asp_ratio_cell_sram = 1.46;
     }
@@ -980,7 +986,12 @@ void init_tech_params(double technology, bool is_tag)
       curr_asp_ratio_cell_sram = 1.46;
     }
 
-
+    //PUJA
+    if(g_ip->ram_cell_ntrans_type == cell8t) {
+      //printf("Characterize 8T cell with %s technology\n", g_ip->ram_cell_ntrans_type);
+      eightCell.set_technology(tech);
+      curr_area_cell_sram = eightCell.characterize();
+    }
 
 //    if(tech == 22){
 //      //For 2016, MPU/ASIC stagger-contacted M1 half-pitch is 22 nm (so this is 32 nm
