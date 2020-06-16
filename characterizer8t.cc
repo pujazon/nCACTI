@@ -56,18 +56,25 @@ using namespace std;
 
 characterizer8t eightCell(0);
 
-characterizer8t::characterizer8t(unsigned int inTech)
+bool AreSame(double a, double b)
 {
-	technology = inTech;
+	//printf("a: %f; b: %f\n",a,b);
+    return (a == b);
 }
 
-unsigned int 
+characterizer8t::characterizer8t(double inTech)
+{
+	technology = inTech;
+    isCalculated = false;
+}
+
+double 
 characterizer8t::get_technology()
 {
 	return technology;
 }
 
-unsigned int 
+double 
 characterizer8t::get_delay()
 {
 	return delay;
@@ -77,7 +84,7 @@ characterizer8t::get_delay()
 //TODO: Input order (nm, pm) and divide it as it should
 //Now always 
 bool 
-characterizer8t::set_technology(unsigned int input)
+characterizer8t::set_technology(double input)
 {
 	technology = input;
 	return (technology == input);
@@ -89,30 +96,30 @@ characterizer8t::characterize6t(
 	 Transistor* inverterNmos2, Transistor* inverterPmos2,
 	 Transistor* accesNmos1, Transistor* accesNmos2)
 {
-	printf("Tech %d\n",technology);
-	accesNmos1->width = 8 * technology;
-    inverterNmos1->width = 4 * technology;
-    inverterPmos1->width = 3 * technology;
+	printf("Tech %f\n",technology);
+	accesNmos1->width = 8;
+    inverterNmos1->width = 4;
+    inverterPmos1->width = 3;
 
 
-	accesNmos2->width = 8 * technology;
-    inverterNmos2->width = 4 * technology;
-    inverterPmos2->width = 3 * technology;
+	accesNmos2->width = 8;
+    inverterNmos2->width = 4;
+    inverterPmos2->width = 3;
 
-	accesNmos1->length = 2 * technology;
-    inverterNmos1->length = 2 * technology;
-    inverterPmos1->length = 3 * technology; 
+	accesNmos1->length = 2;
+    inverterNmos1->length = 2;
+    inverterPmos1->length = 3; 
 
-	accesNmos2->length = 2 * technology;
-    inverterNmos2->length = 2 * technology;
-    inverterPmos2->length = 3 * technology;  
+	accesNmos2->length = 2;
+    inverterNmos2->length = 2;
+    inverterPmos2->length = 3;  
 
-	printf("accesNmos1->width %d\n",accesNmos1->width);
-	printf("accesNmos1->length %d\n",accesNmos1->length);
-	printf("inverterNmos2->width %d\n",inverterNmos2->width);
-	printf("inverterNmos2->length %d\n",inverterNmos2->length);
-	printf("inverterPmos2->width %d\n",inverterPmos2->width);
-	printf("inverterPmos2->length %d\n",inverterPmos2->length);
+	printf("accesNmos1->width %f\n",accesNmos1->width);
+	printf("accesNmos1->length %f\n",accesNmos1->length);
+	printf("inverterNmos2->width %f\n",inverterNmos2->width);
+	printf("inverterNmos2->length %f\n",inverterNmos2->length);
+	printf("inverterPmos2->width %f\n",inverterPmos2->width);
+	printf("inverterPmos2->length %f\n",inverterPmos2->length);
     //TODO: Verbose 
     //TODO: handling errors
 
@@ -120,59 +127,70 @@ characterizer8t::characterize6t(
 }
 
 bool
-characterizer8t::characterizeReadTransistors(Transistor* M1,Transistor* M2,Transistor* M3,Transistor* M4,
-      Transistor* M5,Transistor* M6,Transistor* M7,Transistor* M8)
+characterizer8t::findAllM7M8(double *Cx, double *Rx)
 {
-	unsigned int C5,C6,Cx,R6,R3,Rx;
-	bool find = false;
-	bool afin,bfin,cfin,dfin = false;
-	unsigned int MAX = 24;
+	int sol = 0;
+	int a,b,c,d,i;
+	bool cond1,cond2;
+    Transistor vM7[N_MAX_SIZE]; 
+    Transistor vM8[N_MAX_SIZE]; 
 
-	unsigned int it = 0;
-	unsigned int i,j;
-	unsigned int a,b,c,d = 1;
+    for(i = 0; i < MAX_SIZE; i++) {
+		vM7[sol].length = 0;
+		vM7[sol].width 	= 0;
+		vM8[sol].length = 0;
+		vM8[sol].width 	= 0;
+    }
+
+	printf("Solve:\n");
+	printf("(1) L7 * W7 == %f\n", *Cx);
+	printf("(2) L7 / W7 + L8 / W8 == %f\n", *Rx);
+
+	//Also hurts my eyes but...
+	for(a=1; a < MAX_SIZE+1; a++) {
+		for(b=1; b < MAX_SIZE+1; b++) {
+			for(c=1; c < MAX_SIZE+1; c++) {	
+				for(d=1;d < MAX_SIZE+1; d++) {
+					vM7[sol].length = (double) a;
+					vM7[sol].width 	= (double) b;
+					vM8[sol].length = (double) c;
+					vM8[sol].width 	= (double) d;
+
+					cond1 = ((vM7[sol].length * vM7[sol].width) == (*Cx));
+					cond2 = (((vM7[sol].length/vM7[sol].width)+(vM8[sol].length/vM8[sol].width)) == (*Rx));
+
+					if((cond1 && cond2) && (sol < MAX_SIZE)) {
+						sol++;
+					}
+				}
+			}
+		}
+	}
 	
-	unsigned aSol[MAX];
-	unsigned bSol[MAX];
-	unsigned cSol[MAX];
-	unsigned dSol[MAX];
+	printf("Total solutions: %d\n",sol);
+	for (i=0;i < sol; i++) {
+		printf("L7: %f; W7: %f; L8: %f; W8: %f;\n",vM7[i].length,vM7[i].width,vM8[i].length,vM8[i].width);
+	}
+}
+
+bool
+characterizer8t::characterizeReadTransistors(Transistor* M3, Transistor* M5,Transistor* M6)
+{
+	double C5,C6,Cx,R6,R3,Rx;
 
 	C5 = (M5->width * M5->length);
 	C6 = (M6->width * M6->length);
 
-	Cx = C5 * C6;
+	Cx = C5 + C6;
 	//C7
 
 	R6 = (M6->length / M6->width);
 	R3 = (M3->length / M3->width);
 
-	Rx = R6 + R3;
-	printf("hi");
-	printf("sol1: L7 * W7 == %d\n", Cx);
-	printf("sol1: L7 / W7 + L8 / W8 == %d\n", Rx);
+	Rx = (double) R6 + R3;
 
-/*
-	//SOLVE
-	for(i= 1; i < MAX; i++) {
-		for(j = 0; j < 5; j++){
-			a = i + (j == 0);
-			b = i + (j == 1);
-			c = i + (j == 2);
-			d = i + (j == 3);
-			printf ("%d .. %d .. %d .. %d\n",a,b,c,d);
+	findAllM7M8(&Cx,&Rx);
 
-			if ((a*b == Cx) && ((a/b)+(c/d) == Rx)){
-				aSol[it] = a;
-				bSol[it] = b;
-				cSol[it] = c;
-				dSol[it] = d;
-
-				it++;
-			}
-		}
-	}
-
-	printf("Find %d solutions!\n", it);*/
     return true;
 }
 
@@ -185,13 +203,16 @@ characterizer8t::characterize()
 	Transistor* M4;
 	Transistor* M5;
 	Transistor* M6;
-	Transistor* M7;
-	Transistor* M8;
 
 	bool ret;
 
-	characterize6t(M1,M2,M3,M4,M5,M6);
-	characterizeReadTransistors(M1,M2,M3,M4,M5,M6,M7,M8);
+	if(!isCalculated) {
+		characterize6t(M1,M2,M3,M4,M5,M6);
+		characterizeReadTransistors(M3,M5,M6);
+		isCalculated = true;
+	} else {
+		printf("Already calculated!\n");
+	}
 
 	//TODO hardcoded values should be a list, do the permutations, get the values and give the best characterization
  	return true;

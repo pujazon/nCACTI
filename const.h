@@ -265,5 +265,7 @@ enum ram_cell_ntrans_type
   cell8t = 2
 };
 
+const unsigned int MAX_SIZE=16;
+const unsigned int N_MAX_SIZE=MAX_SIZE*MAX_SIZE;
 
 #endif
